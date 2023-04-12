@@ -1,38 +1,19 @@
-import pyaudio
-import wave
+import sounddevice as sd
+import soundfile as sf
 
-CHUNK = 1024
-FORMAT = pyaudio.paInt16
-CHANNELS = 1
-RATE = 44100
-RECORD_SECONDS = 5
-WAVE_OUTPUT_FILENAME = "output.wav"
+# Define the sampling frequency and duration of the recording
+sample_rate = 44100
+duration = 5  # seconds
 
-p = pyaudio.PyAudio()
+# Use sounddevice to record the audio from the headphone jack
+print("Recording started")
+recording = sd.rec(int(duration * sample_rate), samplerate=sample_rate, channels=1)
 
-stream = p.open(format=FORMAT,
-                channels=CHANNELS,
-                rate=RATE,
-                input=True,
-                frames_per_buffer=CHUNK)
+# Wait for the recording to finish
+sd.wait()
 
-print("Recording...")
+# Save the recording to a WAV file
+sf.write("recording.wav", recording, sample_rate)
 
-frames = []
-
-for i in range(0, int(RATE / CHUNK * RECORD_SECONDS)):
-    data = stream.read(CHUNK)
-    frames.append(data)
-
-print("Finished recording.")
-
-stream.stop_stream()
-stream.close()
-p.terminate()
-
-wf = wave.open(WAVE_OUTPUT_FILENAME, 'wb')
-wf.setnchannels(CHANNELS)
-wf.setsampwidth(p.get_sample_size(FORMAT))
-wf.setframerate(RATE)
-wf.writeframes(b''.join(frames))
-wf.close()
+# Print a message to indicate that the recording has finished
+print("Recording finished")
