@@ -61,8 +61,11 @@ with audio as source:
 print(result)
 
 
-openai.api_key = "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"
-"""
+
+keys_file = open("keys.txt")
+openai.api_key = keys_file.readline()
+
+
 response = openai.Completion.create(
   model="text-davinci-003",
   prompt=result,
@@ -76,7 +79,7 @@ response = openai.Completion.create(
 print(response)
 
 print(response.choices[0].text)
-"""
+
 """
 # Open the .wav file
 with sr.AudioFile(wav_file_path) as source:
