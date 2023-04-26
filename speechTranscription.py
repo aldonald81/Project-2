@@ -52,7 +52,7 @@ wav_file_path = "audio1.wav"
 # Initialize recognizer class                                       
 r = sr.Recognizer()
 # audio object                                                         
-audio = sr.AudioFile("recipe.wav")
+audio = sr.AudioFile(wav_file_path)
 #read audio object and transcribe
 with audio as source:
     audio = r.record(source)                  
