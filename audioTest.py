@@ -10,7 +10,7 @@ while listening:
         recognizer.dynamic_energy_threshold = 3000
         try:
             print("Listening... ")
-            audio = recognizer.listen(source, timeout = 5.0)
+            audio = recognizer.listen(source, timeout = 25.0)
             response = recognizer.recognize_google(audio)
             print(response)
             #return response

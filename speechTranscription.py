@@ -19,7 +19,7 @@ with audio as source:
 print(result)
 
 
-openai.api_key = "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"
+openai.api_key = "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"
 
 response = openai.Completion.create(
   model="text-davinci-003",
