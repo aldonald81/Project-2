@@ -46,7 +46,7 @@ wavefile.close()
 
 
 # Set the file path for the .wav file to transcribe
-wav_file_path = "audio2.wav"
+wav_file_path = "audio1.wav"
 
 
 # Initialize recognizer class                                       
