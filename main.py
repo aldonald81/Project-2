@@ -11,6 +11,9 @@ import time
 # set GPIO mode to BCM
 GPIO.setmode(GPIO.BCM)
 
+GPIO.setup(6, GPIO.OUT) #led
+GPIO.output(6, GPIO.LOW)
+
 # define the pin number for the button
 button_pin = 15
 
@@ -45,6 +48,7 @@ while True:
                             input_device_index = dev_index,input = True, \
                             frames_per_buffer=chunk)
         print("recording")
+        GPIO.output(6, GPIO.HIGH)
         frames = []
 
         # loop through stream and append audio chunks to frame array
@@ -53,6 +57,7 @@ while True:
             frames.append(data)
 
         print("finished recording")
+        GPIO.output(6, GPIO.LOW)
 
         # stop the stream, close it, and terminate the pyaudio instantiation
         stream.stop_stream()
