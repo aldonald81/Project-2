@@ -4,7 +4,11 @@ import wave
 import os
 import openai
 
-
+# Get keys
+keys_file = open("keys.txt")
+keys = keys_file.readlines()
+openai.api_key = keys[0].rstrip('\n')
+auth_token = keys[1]
 
 # RECORD AUDIO
 form_1 = pyaudio.paInt16 # 16-bit resolution
@@ -63,8 +67,7 @@ print(result)
 
 
 
-keys_file = open("keys.txt")
-openai.api_key = keys_file.readline()
+
 
 prompt = "Give me a drink recipe based off this input: " + result + "Also, tell me what their phone number is in the first line of the response and in the format: Number: +17046518034" 
 response = openai.Completion.create(
@@ -85,12 +88,15 @@ print(response.choices[0].text)
 from twilio.rest import Client
 
 account_sid = 'AC99bf8490ba05338f759736951da345e4'
-auth_token = '45318035aef48399137d5f64a90ae3fa'
 client = Client(account_sid, auth_token)
 
-#text = response.choices[0].text
+text = response.choices[0].text
+print(type(text))
 
-text = "Number: +17046518034  \n\nWarm Winter Cider:\n\nNumber: +17046518034\nIngredients:\n-1/2 cup apple cider\n-1/2 cup orange juice\n-1/4 cup pineapple juice\n-1 cinnamon stick\n-1/4 teaspoon ground nutmeg\n-1/4 teaspoon ground allspice\n-1/4 teaspoon ground cloves\n-1/4 teaspoon ground ginger\nInstructions:\n1. In a large saucepan, combine the apple cider, orange juice, pineapple juice, cinnamon stick, nutmeg, allspice, cloves, and ginger.\n2. Bring the mixture to a boil, reduce the heat and simmer for 10-15 minutes.\n3. Strain the mixture into mugs and serve warm. Enjoy!"
+text = '''
+From your Bot Tender:
+''' + text
+
 ## FIND PHONE NUMBER
 # search for the key phrase "Number: "
 key_phrase = "Number: "
