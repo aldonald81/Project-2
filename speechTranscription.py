@@ -10,7 +10,7 @@ form_1 = pyaudio.paInt16 # 16-bit resolution
 chans = 1 # 1 channel
 samp_rate = 44100 # 44.1kHz sampling rate
 chunk = 4096 # 2^12 samples for buffer
-record_secs = 10 # seconds to record
+record_secs = 15 # seconds to record
 dev_index = 1 # device index found by p.get_device_info_by_index(ii)
 wav_output_filename = 'audio1.wav' # name of .wav file
 
@@ -65,10 +65,10 @@ print(result)
 keys_file = open("keys.txt")
 openai.api_key = keys_file.readline()
 
-
+prompt = "Give me a drink recipe based off this input: " + result + "Also, tell me what their phone number is in the first line of the response and in the format: Number: +17046518034" 
 response = openai.Completion.create(
   model="text-davinci-003",
-  prompt=result,
+  prompt=prompt,
   temperature=0.7,
   max_tokens=256,
   top_p=1,
@@ -80,6 +80,37 @@ print(response)
 
 print(response.choices[0].text)
 
+"""
+from twilio.rest import Client
+
+account_sid = 'AC99bf8490ba05338f759736951da345e4'
+auth_token = '336d36a4636b2bef5f51ab7a1f20efe6'
+client = Client(account_sid, auth_token)
+
+text = response.choices[0].text
+
+## FIND PHONE NUMBER
+# search for the key phrase "Number: "
+key_phrase = "Number: "
+index = text.find(key_phrase)
+
+if index != -1:
+    # extract the phone number
+    phone_number = text[index + len(key_phrase):].split()[0]
+    print("Phone number:", phone_number)
+else:
+    print("No phone number found in the response.")
+
+print(phone_number)
+
+message = client.messages.create(
+  from_='+18777194710',
+  body=text,
+  to=phone_number
+)
+
+print(message.sid)
+"""
 """
 # Open the .wav file
 with sr.AudioFile(wav_file_path) as source:
