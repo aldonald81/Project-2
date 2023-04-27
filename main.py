@@ -12,7 +12,7 @@ import time
 GPIO.setmode(GPIO.BCM)
 
 # define the pin number for the button
-button_pin = 17
+button_pin = 15
 
 # set the pin as input with a pull-down resistor
 GPIO.setup(button_pin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
