@@ -48,10 +48,7 @@ while True:
         frames = []
 
         # loop through stream and append audio chunks to frame array
-        # for ii in range(0,int((samp_rate/chunk)*record_secs)):
-        #     data = stream.read(chunk)
-        #     frames.append(data)
-        while GPIO.input(button_pin) == GPIO.HIGH:
+        for ii in range(0,int((samp_rate/chunk)*record_secs)):
             data = stream.read(chunk)
             frames.append(data)
 
