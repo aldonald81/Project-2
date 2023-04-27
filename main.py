@@ -48,7 +48,10 @@ while True:
         frames = []
 
         # loop through stream and append audio chunks to frame array
-        for ii in range(0,int((samp_rate/chunk)*record_secs)):
+        # for ii in range(0,int((samp_rate/chunk)*record_secs)):
+        #     data = stream.read(chunk)
+        #     frames.append(data)
+        while GPIO.input(button_pin) == GPIO.HIGH:
             data = stream.read(chunk)
             frames.append(data)
 
@@ -132,6 +135,15 @@ while True:
             #print(message.sid)
         else:
             print("No phone number found in the response.")
+            # extract the phone number
+
+            message = client.messages.create(
+            from_='+17046518034',
+            body=text,
+            to=phone_number
+            )
+
+            #print(message.sid)
 
         
 
