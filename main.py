@@ -1,67 +1,147 @@
-import os
-import time
-import wave
-import pyaudio
 import speech_recognition as sr
-import RPi.GPIO as GPIO
+import pyaudio
+import wave
+import os
+import openai
 
-# Set up GPIO button
-GPIO.setmode(GPIO.BOARD)
-GPIO.setup(12, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
-# Set up audio recording
-FORMAT = pyaudio.paInt16
-CHANNELS = 1
-RATE = 44100
-CHUNK = 1024
-RECORD_SECONDS = 5
+from gpiozero import Button
 
-# Set up speech recognition
-r = sr.Recognizer()
+# create a Button object that represents the button on pin 12
+button = Button(12)
 
+# define a function to execute when the button is pressed
+def on_button_pressed():
+  print("Button was pressed!")
+
+  # RECORD AUDIO
+  form_1 = pyaudio.paInt16 # 16-bit resolution
+  chans = 1 # 1 channel
+  samp_rate = 44100 # 44.1kHz sampling rate
+  chunk = 4096 # 2^12 samples for buffer
+  record_secs = 15 # seconds to record
+  dev_index = 1 # device index found by p.get_device_info_by_index(ii)
+  wav_output_filename = 'audio1.wav' # name of .wav file
+
+  audio = pyaudio.PyAudio() # create pyaudio instantiation
+
+  # create pyaudio stream
+  stream = audio.open(format = form_1,rate = samp_rate,channels = chans, \
+                      input_device_index = dev_index,input = True, \
+                      frames_per_buffer=chunk)
+  print("recording")
+  frames = []
+
+  # loop through stream and append audio chunks to frame array
+  for ii in range(0,int((samp_rate/chunk)*record_secs)):
+      data = stream.read(chunk)
+      frames.append(data)
+
+  print("finished recording")
+
+  # stop the stream, close it, and terminate the pyaudio instantiation
+  stream.stop_stream()
+  stream.close()
+  audio.terminate()
+
+  # save the audio frames as .wav file
+  wavefile = wave.open(wav_output_filename,'wb')
+  wavefile.setnchannels(chans)
+  wavefile.setsampwidth(audio.get_sample_size(form_1))
+  wavefile.setframerate(samp_rate)
+  wavefile.writeframes(b''.join(frames))
+  wavefile.close()
+  ########################3
+
+
+  # Set the file path for the .wav file to transcribe
+  wav_file_path = "audio1.wav"
+
+
+  # Initialize recognizer class                                       
+  r = sr.Recognizer()
+  # audio object                                                         
+  audio = sr.AudioFile(wav_file_path)
+  #read audio object and transcribe
+  with audio as source:
+      audio = r.record(source)                  
+      result = r.recognize_google(audio)
+      
+  print(result)
+
+
+
+  keys_file = open("keys.txt")
+  openai.api_key = keys_file.readline()
+
+  prompt = "Give me a drink recipe based off this input: " + result + "Also, tell me what their phone number is in the first line of the response and in the format: Number: +17046518034" 
+  response = openai.Completion.create(
+    model="text-davinci-003",
+    prompt=prompt,
+    temperature=0.7,
+    max_tokens=256,
+    top_p=1,
+    frequency_penalty=0,
+    presence_penalty=0
+  )
+
+  print(response)
+
+  print(response.choices[0].text)
+
+
+  from twilio.rest import Client
+
+  account_sid = 'AC99bf8490ba05338f759736951da345e4'
+  auth_token = '45318035aef48399137d5f64a90ae3fa'
+  client = Client(account_sid, auth_token)
+
+  #text = response.choices[0].text
+
+  text = "Number: +17046518034  \n\nWarm Winter Cider:\n\nNumber: +17046518034\nIngredients:\n-1/2 cup apple cider\n-1/2 cup orange juice\n-1/4 cup pineapple juice\n-1 cinnamon stick\n-1/4 teaspoon ground nutmeg\n-1/4 teaspoon ground allspice\n-1/4 teaspoon ground cloves\n-1/4 teaspoon ground ginger\nInstructions:\n1. In a large saucepan, combine the apple cider, orange juice, pineapple juice, cinnamon stick, nutmeg, allspice, cloves, and ginger.\n2. Bring the mixture to a boil, reduce the heat and simmer for 10-15 minutes.\n3. Strain the mixture into mugs and serve warm. Enjoy!"
+  ## FIND PHONE NUMBER
+  # search for the key phrase "Number: "
+  key_phrase = "Number: "
+  index = text.find(key_phrase)
+
+  if index != -1:
+      # extract the phone number
+      phone_number = text[index + len(key_phrase):].split()[0]
+      print("Phone number:", phone_number)
+  else:
+      print("No phone number found in the response.")
+
+  print(phone_number)
+
+  message = client.messages.create(
+    from_='+18777194710',
+    body=text,
+    to=phone_number
+  )
+
+  print(message.sid)
+
+  """
+  # Open the .wav file
+  with sr.AudioFile(wav_file_path) as source:
+      # Read the audio data from the file
+      audio_data = r.record(source)
+
+      # Use the recognizer to transcribe the audio to text
+      text = r.recognize_google(audio_data)
+
+  # Print the transcribed text
+  print("Transcribed text:")
+  print(text)
+  """
+
+
+
+# attach the function to the button's 'when_pressed' event
+button.when_pressed = on_button_pressed
+
+# keep the program running
 while True:
-    input_state = GPIO.input(12)
-    if input_state == False:
-        print("Recording started...")
-        p = pyaudio.PyAudio()
-        frames = []
-        stream = p.open(format=FORMAT,
-                        channels=CHANNELS,
-                        rate=RATE,
-                        input=True,
-                        frames_per_buffer=CHUNK)
-        
-        while input_state == False:
-            data = stream.read(CHUNK)
-            frames.append(data)
-            input_state = GPIO.input(12)
-            
-        print("Recording stopped...")
-        stream.stop_stream()
-        stream.close()
-        p.terminate()
-        
-        # Save audio file
-        filename = "recording.wav"
-        wf = wave.open(filename, 'wb')
-        wf.setnchannels(CHANNELS)
-        wf.setsampwidth(p.get_sample_size(FORMAT))
-        wf.setframerate(RATE)
-        wf.writeframes(b''.join(frames))
-        wf.close()
-        
-        # Transcribe audio file
-        with sr.AudioFile(filename) as source:
-            audio = r.record(source)
-        try:
-            text = r.recognize_google(audio)
-            print("Transcription: " + text)
-        except sr.UnknownValueError:
-            print("Transcription could not be understood")
-        except sr.RequestError as e:
-            print("Could not request results from Google Speech Recognition service; {0}".format(e))
-        
-        # Wait for button release to prevent multiple recordings
-        while input_state == False:
-            input_state = GPIO.input(12)
-    time.sleep(0.1)
+    pass
+
+

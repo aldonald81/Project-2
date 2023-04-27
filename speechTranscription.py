@@ -5,6 +5,7 @@ import os
 import openai
 
 
+
 # RECORD AUDIO
 form_1 = pyaudio.paInt16 # 16-bit resolution
 chans = 1 # 1 channel
@@ -80,15 +81,16 @@ print(response)
 
 print(response.choices[0].text)
 
-"""
+
 from twilio.rest import Client
 
 account_sid = 'AC99bf8490ba05338f759736951da345e4'
-auth_token = '336d36a4636b2bef5f51ab7a1f20efe6'
+auth_token = '45318035aef48399137d5f64a90ae3fa'
 client = Client(account_sid, auth_token)
 
-text = response.choices[0].text
+#text = response.choices[0].text
 
+text = "Number: +17046518034  \n\nWarm Winter Cider:\n\nNumber: +17046518034\nIngredients:\n-1/2 cup apple cider\n-1/2 cup orange juice\n-1/4 cup pineapple juice\n-1 cinnamon stick\n-1/4 teaspoon ground nutmeg\n-1/4 teaspoon ground allspice\n-1/4 teaspoon ground cloves\n-1/4 teaspoon ground ginger\nInstructions:\n1. In a large saucepan, combine the apple cider, orange juice, pineapple juice, cinnamon stick, nutmeg, allspice, cloves, and ginger.\n2. Bring the mixture to a boil, reduce the heat and simmer for 10-15 minutes.\n3. Strain the mixture into mugs and serve warm. Enjoy!"
 ## FIND PHONE NUMBER
 # search for the key phrase "Number: "
 key_phrase = "Number: "
@@ -110,7 +112,7 @@ message = client.messages.create(
 )
 
 print(message.sid)
-"""
+
 """
 # Open the .wav file
 with sr.AudioFile(wav_file_path) as source:
