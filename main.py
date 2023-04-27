@@ -125,18 +125,20 @@ while True:
             # extract the phone number
             phone_number = text[index + len(key_phrase):].split()[0]
             print("Phone number:", phone_number)
+
+            print(phone_number)
+
+            message = client.messages.create(
+            from_='+18777194710',
+            body=text,
+            to=phone_number
+            )
+
+            print(message.sid)
         else:
             print("No phone number found in the response.")
 
-        print(phone_number)
-
-        message = client.messages.create(
-        from_='+18777194710',
-        body=text,
-        to=phone_number
-        )
-
-        print(message.sid)
+        
 
         # add a small delay to avoid multiple detections
         time.sleep(0.2)
