@@ -5,8 +5,27 @@ import os
 import openai
 
 
-from gpiozero import Button
+import RPi.GPIO as GPIO
+import time
 
+# set GPIO mode to BCM
+GPIO.setmode(GPIO.BCM)
+
+# define the pin number for the button
+button_pin = 17
+
+# set the pin as input with a pull-down resistor
+GPIO.setup(button_pin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+
+while True:
+    # wait for button press
+    if GPIO.input(button_pin) == GPIO.HIGH:
+        # button is pressed, do something here
+        print("Button pressed!")
+        # add a small delay to avoid multiple detections
+        time.sleep(0.2)
+
+"""
 # create a Button object that represents the button on pin 12
 button = Button(12)
 
@@ -138,4 +157,4 @@ button.when_pressed = on_button_pressed
 while True:
     pass
 
-
+"""
