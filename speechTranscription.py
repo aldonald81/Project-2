@@ -118,17 +118,3 @@ message = client.messages.create(
 )
 
 print(message.sid)
-
-"""
-# Open the .wav file
-with sr.AudioFile(wav_file_path) as source:
-    # Read the audio data from the file
-    audio_data = r.record(source)
-
-    # Use the recognizer to transcribe the audio to text
-    text = r.recognize_google(audio_data)
-
-# Print the transcribed text
-print("Transcribed text:")
-print(text)
-"""
